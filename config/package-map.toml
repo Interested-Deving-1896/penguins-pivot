@@ -1,0 +1,327 @@
+# config/package-map.toml
+# Cross-distro package name translation table.
+#
+# Each entry maps a canonical package name to its name in each distro's
+# package manager. Missing entries mean the package is not available or
+# not needed on that distro.
+#
+# Canonical names follow the most common/descriptive convention.
+# Used by extractors (running system → canonical) and installers
+# (canonical → target distro package name).
+#
+# distro keys: debian ubuntu devuan arch fedora alpine void opensuse gentoo
+
+# ── base system ───────────────────────────────────────────────────────────────
+
+[packages.bash]
+debian   = "bash"
+ubuntu   = "bash"
+devuan   = "bash"
+arch     = "bash"
+fedora   = "bash"
+alpine   = "bash"
+void     = "bash"
+opensuse = "bash"
+gentoo   = "app-shells/bash"
+
+[packages.sudo]
+debian   = "sudo"
+ubuntu   = "sudo"
+devuan   = "sudo"
+arch     = "sudo"
+fedora   = "sudo"
+alpine   = "sudo"
+void     = "sudo"
+opensuse = "sudo"
+gentoo   = "app-admin/sudo"
+
+[packages.curl]
+debian   = "curl"
+ubuntu   = "curl"
+devuan   = "curl"
+arch     = "curl"
+fedora   = "curl"
+alpine   = "curl"
+void     = "curl"
+opensuse = "curl"
+gentoo   = "net-misc/curl"
+
+[packages.wget]
+debian   = "wget"
+ubuntu   = "wget"
+devuan   = "wget"
+arch     = "wget"
+fedora   = "wget"
+alpine   = "wget"
+void     = "wget"
+opensuse = "wget"
+gentoo   = "net-misc/wget"
+
+[packages.git]
+debian   = "git"
+ubuntu   = "git"
+devuan   = "git"
+arch     = "git"
+fedora   = "git"
+alpine   = "git"
+void     = "git"
+opensuse = "git"
+gentoo   = "dev-vcs/git"
+
+[packages.openssh-server]
+debian   = "openssh-server"
+ubuntu   = "openssh-server"
+devuan   = "openssh-server"
+arch     = "openssh"
+fedora   = "openssh-server"
+alpine   = "openssh"
+void     = "openssh"
+opensuse = "openssh"
+gentoo   = "net-misc/openssh"
+
+[packages.openssh-client]
+debian   = "openssh-client"
+ubuntu   = "openssh-client"
+devuan   = "openssh-client"
+arch     = "openssh"
+fedora   = "openssh-clients"
+alpine   = "openssh-client"
+void     = "openssh"
+opensuse = "openssh-clients"
+gentoo   = "net-misc/openssh"
+
+# ── editors ───────────────────────────────────────────────────────────────────
+
+[packages.vim]
+debian   = "vim"
+ubuntu   = "vim"
+devuan   = "vim"
+arch     = "vim"
+fedora   = "vim-enhanced"
+alpine   = "vim"
+void     = "vim"
+opensuse = "vim"
+gentoo   = "app-editors/vim"
+
+[packages.nano]
+debian   = "nano"
+ubuntu   = "nano"
+devuan   = "nano"
+arch     = "nano"
+fedora   = "nano"
+alpine   = "nano"
+void     = "nano"
+opensuse = "nano"
+gentoo   = "app-editors/nano"
+
+[packages.neovim]
+debian   = "neovim"
+ubuntu   = "neovim"
+devuan   = "neovim"
+arch     = "neovim"
+fedora   = "neovim"
+alpine   = "neovim"
+void     = "neovim"
+opensuse = "neovim"
+gentoo   = "app-editors/neovim"
+
+# ── network ───────────────────────────────────────────────────────────────────
+
+[packages.networkmanager]
+debian   = "network-manager"
+ubuntu   = "network-manager"
+devuan   = "network-manager"
+arch     = "networkmanager"
+fedora   = "NetworkManager"
+alpine   = "networkmanager"
+void     = "NetworkManager"
+opensuse = "NetworkManager"
+gentoo   = "net-misc/networkmanager"
+
+[packages.iproute2]
+debian   = "iproute2"
+ubuntu   = "iproute2"
+devuan   = "iproute2"
+arch     = "iproute2"
+fedora   = "iproute"
+alpine   = "iproute2"
+void     = "iproute2"
+opensuse = "iproute2"
+gentoo   = "sys-apps/iproute2"
+
+[packages.nftables]
+debian   = "nftables"
+ubuntu   = "nftables"
+devuan   = "nftables"
+arch     = "nftables"
+fedora   = "nftables"
+alpine   = "nftables"
+void     = "nftables"
+opensuse = "nftables"
+gentoo   = "net-firewall/nftables"
+
+[packages.wireguard]
+debian   = "wireguard"
+ubuntu   = "wireguard"
+devuan   = "wireguard"
+arch     = "wireguard-tools"
+fedora   = "wireguard-tools"
+alpine   = "wireguard-tools"
+void     = "wireguard-tools"
+opensuse = "wireguard-tools"
+gentoo   = "net-vpn/wireguard-tools"
+
+# ── filesystems ───────────────────────────────────────────────────────────────
+
+[packages.btrfs-progs]
+debian   = "btrfs-progs"
+ubuntu   = "btrfs-progs"
+devuan   = "btrfs-progs"
+arch     = "btrfs-progs"
+fedora   = "btrfs-progs"
+alpine   = "btrfs-progs"
+void     = "btrfs-progs"
+opensuse = "btrfsprogs"
+gentoo   = "sys-fs/btrfs-progs"
+
+[packages.e2fsprogs]
+debian   = "e2fsprogs"
+ubuntu   = "e2fsprogs"
+devuan   = "e2fsprogs"
+arch     = "e2fsprogs"
+fedora   = "e2fsprogs"
+alpine   = "e2fsprogs"
+void     = "e2fsprogs"
+opensuse = "e2fsprogs"
+gentoo   = "sys-fs/e2fsprogs"
+
+[packages.xfsprogs]
+debian   = "xfsprogs"
+ubuntu   = "xfsprogs"
+devuan   = "xfsprogs"
+arch     = "xfsprogs"
+fedora   = "xfsprogs"
+alpine   = "xfsprogs"
+void     = "xfsprogs"
+opensuse = "xfsprogs"
+gentoo   = "sys-fs/xfsprogs"
+
+# ── init systems ──────────────────────────────────────────────────────────────
+
+[packages.systemd]
+debian   = "systemd"
+ubuntu   = "systemd"
+devuan   = ""
+arch     = "systemd"
+fedora   = "systemd"
+alpine   = ""
+void     = ""
+opensuse = "systemd"
+gentoo   = "sys-apps/systemd"
+
+[packages.openrc]
+debian   = "openrc"
+ubuntu   = "openrc"
+devuan   = "openrc"
+arch     = "openrc"
+fedora   = "openrc"
+alpine   = "openrc"
+void     = "openrc"
+opensuse = "openrc"
+gentoo   = "sys-apps/openrc"
+
+[packages.runit]
+debian   = "runit"
+ubuntu   = "runit"
+devuan   = "runit"
+arch     = "runit"
+fedora   = ""
+alpine   = "runit"
+void     = "runit"
+opensuse = ""
+gentoo   = "sys-process/runit"
+
+# ── display / desktop ─────────────────────────────────────────────────────────
+
+[packages.xorg-server]
+debian   = "xorg"
+ubuntu   = "xorg"
+devuan   = "xorg"
+arch     = "xorg-server"
+fedora   = "xorg-x11-server-Xorg"
+alpine   = "xorg-server"
+void     = "xorg-server"
+opensuse = "xorg-x11-server"
+gentoo   = "x11-base/xorg-server"
+
+[packages.wayland]
+debian   = "libwayland-dev"
+ubuntu   = "libwayland-dev"
+devuan   = "libwayland-dev"
+arch     = "wayland"
+fedora   = "wayland-devel"
+alpine   = "wayland-dev"
+void     = "wayland-devel"
+opensuse = "wayland-devel"
+gentoo   = "dev-libs/wayland"
+
+[packages.pipewire]
+debian   = "pipewire"
+ubuntu   = "pipewire"
+devuan   = "pipewire"
+arch     = "pipewire"
+fedora   = "pipewire"
+alpine   = "pipewire"
+void     = "pipewire"
+opensuse = "pipewire"
+gentoo   = "media-video/pipewire"
+
+# ── containers ────────────────────────────────────────────────────────────────
+
+[packages.docker]
+debian   = "docker.io"
+ubuntu   = "docker.io"
+devuan   = "docker.io"
+arch     = "docker"
+fedora   = "docker"
+alpine   = "docker"
+void     = "docker"
+opensuse = "docker"
+gentoo   = "app-containers/docker"
+
+[packages.podman]
+debian   = "podman"
+ubuntu   = "podman"
+devuan   = "podman"
+arch     = "podman"
+fedora   = "podman"
+alpine   = "podman"
+void     = "podman"
+opensuse = "podman"
+gentoo   = "app-containers/podman"
+
+# ── kernel packages ───────────────────────────────────────────────────────────
+# These are arch-specific — the installer uses arch helpers to resolve the
+# correct package name. Listed here for documentation only.
+
+[packages.linux-kernel]
+debian   = "linux-image-{arch}"   # resolved by _debian_kernel() in installers/debian.sh
+ubuntu   = "linux-image-generic"
+devuan   = "linux-image-{arch}"
+arch     = "linux"
+fedora   = "kernel"
+alpine   = "linux-lts"            # resolved by _alpine_kernel()
+void     = "linux"
+opensuse = "kernel-default"
+gentoo   = "gentoo-kernel-bin"
+
+[packages.linux-headers]
+debian   = "linux-headers-{arch}"
+ubuntu   = "linux-headers-generic"
+devuan   = "linux-headers-{arch}"
+arch     = "linux-headers"
+fedora   = "kernel-headers"
+alpine   = "linux-headers"
+void     = "linux-headers"
+opensuse = "kernel-devel"
+gentoo   = "sys-kernel/linux-headers"

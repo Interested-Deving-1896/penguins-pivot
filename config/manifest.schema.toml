@@ -1,0 +1,86 @@
+# config/manifest.schema.toml
+# Canonical schema for a linux-pivot system manifest.
+#
+# A manifest is a distro-agnostic, arch-agnostic description of a running
+# Linux system. It is produced by an extractor and consumed by an installer.
+# All fields are optional unless marked required.
+
+[manifest]
+# Schema version — bumped on breaking changes
+version = 1
+
+# ── identity ──────────────────────────────────────────────────────────────────
+[system]
+hostname    = ""          # required
+arch        = ""          # required: amd64 arm64 armhf riscv64 ppc64el s390x loong64 i386
+distro      = ""          # required: debian ubuntu devuan arch fedora alpine void opensuse gentoo
+release     = ""          # distro release name (trixie, noble, rolling, ...)
+init        = ""          # systemd | openrc | runit | s6 | dinit
+libc        = ""          # glibc | musl | uclibc
+locale      = ""          # e.g. en_US.UTF-8
+timezone    = ""          # e.g. UTC
+keymap      = ""          # e.g. us
+
+# ── kernel ────────────────────────────────────────────────────────────────────
+[kernel]
+version     = ""          # e.g. 6.9.3
+flavor      = ""          # generic | lts | rt | xanmod | liquorix | liqxanmod | custom
+package     = ""          # distro package name (e.g. linux-image-amd64)
+config_sha  = ""          # SHA256 of /boot/config-*
+cmdline     = ""          # contents of /proc/cmdline
+modules     = []          # list of loaded module names (lsmod)
+firmware    = []          # list of firmware files in /lib/firmware
+
+# ── bootloader ────────────────────────────────────────────────────────────────
+[bootloader]
+type        = ""          # grub2 | systemd-boot | uboot | barebox | syslinux | extlinux
+config_path = ""          # path to main config file
+efi         = false       # true if EFI boot
+
+# ── storage ───────────────────────────────────────────────────────────────────
+[[fstab]]
+device      = ""
+mountpoint  = ""
+fstype      = ""
+options     = ""
+dump        = 0
+pass        = 0
+
+# ── network ───────────────────────────────────────────────────────────────────
+[network]
+manager     = ""          # networkmanager | systemd-networkd | ifupdown | netifrc | wicked
+interfaces  = []          # list of interface names
+
+# ── users ─────────────────────────────────────────────────────────────────────
+[[users]]
+name        = ""          # required
+uid         = 0
+gid         = 0
+shell       = ""
+home        = ""
+groups      = []
+password_hash = ""        # from /etc/shadow
+
+# ── packages ─────────────────────────────────────────────────────────────────
+[packages]
+# Canonical package names (mapped via package-map.toml)
+# Populated by the extractor from the running system's package manager.
+installed   = []          # list of canonical package names
+explicit    = []          # explicitly installed (not pulled in as deps)
+excluded    = []          # packages to skip during install on target
+
+# ── services ─────────────────────────────────────────────────────────────────
+[services]
+enabled     = []          # list of enabled service names
+disabled    = []          # list of explicitly disabled service names
+
+# ── preserve ─────────────────────────────────────────────────────────────────
+[preserve]
+# Paths to copy verbatim from source to target (after bootstrap)
+paths       = [
+  "/home",
+  "/root",
+  "/etc/ssh/ssh_host_*",
+  "/etc/ssl/certs",
+  "/var/lib/bluetooth",
+]
