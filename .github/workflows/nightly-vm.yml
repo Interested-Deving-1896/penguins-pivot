@@ -1,14 +1,18 @@
 name: Nightly VM Tests
 
-# Full end-to-end pivot tests inside real VMs via QEMU/KVM.
-# Runs nightly and on manual dispatch. Requires a self-hosted runner with
-# KVM access (label: self-hosted, kvm) OR falls back to QEMU TCG on
-# standard runners (slower but functional).
+# Full end-to-end pivot tests inside real VMs.
 #
-# Each job:
-#   1. Boots a minimal cloud image of the source distro
-#   2. Runs pivot.sh inside it to convert to the target distro
-#   3. Reboots into the converted system and runs a smoke test
+# Runner selection (set vars.KVM_RUNNER in repo/org settings):
+#   - Incus self-hosted runner (recommended): set KVM_RUNNER to the runner
+#     label, e.g. "[self-hosted, kvm, incus]". Run scripts/ci/incus-setup-runner.sh
+#     once on a bare-metal host to provision it. VMs run KVM-accelerated inside
+#     Incus with pre-pulled images — fast and clean.
+#   - GitHub-hosted fallback: if KVM_RUNNER is unset, falls back to ubuntu-24.04
+#     (ubuntu-26.04 runner images are not yet available on GitHub Actions as of
+#     2026-05; bump this label when they appear). Uses raw QEMU with TCG — slower
+#     but functional without any setup.
+#
+# scripts/ci/run-in-vm.sh detects Incus automatically and uses it when present.
 
 on:
   schedule:
@@ -16,7 +20,7 @@ on:
   workflow_dispatch:
     inputs:
       matrix_filter:
-        description: "Run only this source→target pair (e.g. ubuntu→arch)"
+        description: "Run only this source→target pair (e.g. ubuntu-to-arch)"
         required: false
         default: ""
       keep_artifacts:
@@ -31,74 +35,63 @@ permissions:
 jobs:
   vm-pivot:
     name: vm / ${{ matrix.src }}→${{ matrix.dst }}
-    # Use self-hosted KVM runner if available; fall back to ubuntu-24.04
     runs-on: ${{ vars.KVM_RUNNER || 'ubuntu-24.04' }}
     timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
         include:
-          # Debian-family → other
-          - src: ubuntu   dst: debian   src_image: ubuntu-24.04-minimal
-          - src: ubuntu   dst: arch     src_image: ubuntu-24.04-minimal
-          - src: ubuntu   dst: alpine   src_image: ubuntu-24.04-minimal
-          - src: debian   dst: fedora   src_image: debian-12-minimal
-          - src: debian   dst: void     src_image: debian-12-minimal
-          # Arch → other
-          - src: arch     dst: debian   src_image: arch-latest-minimal
-          - src: arch     dst: ubuntu   src_image: arch-latest-minimal
-          # Alpine → other
-          - src: alpine   dst: debian   src_image: alpine-3.20-minimal
-          - src: alpine   dst: arch     src_image: alpine-3.20-minimal
+          # Incus image aliases match those pre-pulled by incus-setup-runner.sh.
+          # The QEMU fallback path uses fetch-cloud-image.sh with the same key.
+          - src: ubuntu   dst: debian   image: ubuntu-24.04
+          - src: ubuntu   dst: arch     image: ubuntu-24.04
+          - src: ubuntu   dst: alpine   image: ubuntu-24.04
+          - src: debian   dst: fedora   image: debian-12
+          - src: debian   dst: void     image: debian-12
+          - src: arch     dst: debian   image: arch-latest
+          - src: arch     dst: ubuntu   image: arch-latest
+          - src: alpine   dst: debian   image: alpine-3.20
+          - src: alpine   dst: arch     image: alpine-3.20
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install QEMU + cloud-image tools
+      - name: Install tooling (QEMU fallback path only)
+        # On Incus runners these are already present; on GitHub-hosted runners
+        # we need qemu + cloud-image-utils for the fallback path.
+        if: ${{ vars.KVM_RUNNER == '' || vars.KVM_RUNNER == null }}
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends \
             qemu-system-x86 qemu-utils cloud-image-utils \
-            libguestfs-tools python3 curl
+            libguestfs-tools python3 curl openssh-client
 
-      - name: Download source cloud image
+      - name: Fetch cloud image (QEMU fallback path only)
+        if: ${{ vars.KVM_RUNNER == '' || vars.KVM_RUNNER == null }}
         run: |
           bash scripts/ci/fetch-cloud-image.sh \
-            "${{ matrix.src_image }}" \
+            "${{ matrix.image }}" \
             /tmp/src.img
         timeout-minutes: 10
 
-      - name: Inject pivot.sh into image
-        run: |
-          # Copy the entire repo into the image's /opt/linux-pivot
-          virt-copy-in -a /tmp/src.img . /opt/linux-pivot
-          # Also inject a run-pivot.sh helper
-          cat > /tmp/run-pivot.sh << 'SCRIPT'
-          #!/bin/bash
-          set -euo pipefail
-          cd /opt/linux-pivot
-          bash pivot.sh \
-            --to TARGET_DISTRO \
-            --target /mnt/pivot-target \
-            --jobs 2 \
-            2>&1 | tee /tmp/pivot.log
-          echo "PIVOT_EXIT=$?" >> /tmp/pivot-result.env
-          SCRIPT
-          sed -i "s/TARGET_DISTRO/${{ matrix.dst }}/" /tmp/run-pivot.sh
-          virt-copy-in -a /tmp/src.img /tmp/run-pivot.sh /root/
-
       - name: Run pivot inside VM
         run: |
+          # Incus path: pass image alias directly
+          # QEMU path:  pass /tmp/src.img
+          IMAGE="${{ vars.KVM_RUNNER != '' && vars.KVM_RUNNER != null && '${{ matrix.image }}' || '/tmp/src.img' }}"
           bash scripts/ci/run-in-vm.sh \
-            /tmp/src.img \
-            "bash /root/run-pivot.sh" \
+            "$IMAGE" \
+            "cd /opt/linux-pivot && bash extractors/${{ matrix.src }}.sh /tmp/test.manifest.toml / && bash pivot.sh --from /tmp/test.manifest.toml --to ${{ matrix.dst }} --target /mnt/pivot-target --jobs 2" \
             /tmp/pivot.log
         timeout-minutes: 60
 
       - name: Extract and verify converted rootfs
         run: |
-          # Pull the converted rootfs out of the VM image
-          virt-copy-out -a /tmp/src.img /mnt/pivot-target /tmp/
+          if command -v incus &>/dev/null; then
+            incus file pull -r "pivot-ci-$$/mnt/pivot-target" /tmp/
+          else
+            virt-copy-out -a /tmp/src.img /mnt/pivot-target /tmp/
+          fi
           bash scripts/ci/verify-rootfs.sh /tmp/pivot-target "${{ matrix.dst }}"
 
       - name: Upload converted rootfs
