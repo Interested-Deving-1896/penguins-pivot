@@ -18,6 +18,37 @@ source "$(dirname "${BASH_SOURCE[0]}")/../lib/chroot.sh"
 
 STAGE3_REPO="${STAGE3_REPO:-Interested-Deving-1896/linux-distro-stage3}"
 
+# ── mock bootstrap mode ───────────────────────────────────────────────────────
+# Set PIVOT_MOCK_BOOTSTRAP=1 to stub out all network/package-manager calls.
+# In mock mode every bootstrap/install function logs what it would do and
+# creates a minimal rootfs skeleton so downstream steps can still run.
+# Used by CI container and unit-test jobs.
+PIVOT_MOCK_BOOTSTRAP="${PIVOT_MOCK_BOOTSTRAP:-0}"
+
+mock_bootstrap_rootfs() {
+  # Create a minimal rootfs skeleton that satisfies downstream common steps
+  local target="$1"
+  log_info "[mock] creating skeleton rootfs at ${target}"
+  mkdir -p "${target}"/{etc,usr/bin,var,tmp,home,root,proc,sys,dev}
+  echo "mock"          > "${target}/etc/hostname"
+  echo "LANG=C.UTF-8"  > "${target}/etc/locale.conf"
+  echo "root:x:0:0:root:/root:/bin/bash" > "${target}/etc/passwd"
+  echo "root:!:19000:0:99999:7:::"       > "${target}/etc/shadow"
+  echo "root:x:0:"                        > "${target}/etc/group"
+  touch "${target}/etc/fstab"
+}
+
+# Wrap a command: run it normally, or log+skip in mock mode.
+# Usage: maybe_run DESCRIPTION CMD [ARGS...]
+maybe_run() {
+  local desc="$1"; shift
+  if [[ "$PIVOT_MOCK_BOOTSTRAP" == "1" ]]; then
+    log_info "[mock] would run: ${desc}"
+    return 0
+  fi
+  "$@"
+}
+
 # ── fetch stage3 from linux-distro-stage3 releases ───────────────────────────
 fetch_stage3() {
   local distro="$1" release="$2" arch="$3" dest="$4"
