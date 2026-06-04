@@ -1,21 +1,29 @@
+[update-readmes]   Mode: rewrite — migrating to template structure...
 # penguins-pivot
 
-A fork of [linux-pivot](https://github.com/Interested-Deving-1896/linux-pivot)
-wired into the [penguins-eggs](https://github.com/pieroproietti/penguins-eggs)
-all-features ecosystem. Enables live-ISO-based distro conversion: take a
-penguins-eggs live ISO of any supported distro and remaster it as a different
-distro, preserving users, services, and configuration.
+[![Built with Ona](https://ona.com/build-with-ona.svg)](https://app.ona.com/#https://github.com/Interested-Deving-1896/penguins-pivot)
 
-## What this adds over linux-pivot
+<!-- AI:start:what-it-does -->
+_Description pending._
+<!-- AI:end:what-it-does -->
 
-- `penguins-eggs/integration.sh` — integration layer called by penguins-eggs
-  during the pivot phase of an ISO build or live-system remaster
-- Manifest augmentation with eggs metadata (version, features, calamares flag)
-- Automatic re-installation and re-configuration of penguins-eggs in the
-  converted rootfs
-- Feature flag passthrough (`calamares`, `wayland`, `firmware`, etc.)
+## Architecture
+
+<!-- AI:start:architecture -->
+_Architecture documentation pending._
+<!-- AI:end:architecture -->
+
+## Install
+
+<!-- Add installation instructions here. This section is yours — the AI will not modify it. -->
+
+```bash
+git clone https://github.com/Interested-Deving-1896/penguins-pivot.git
+cd penguins-pivot
+```
 
 ## Usage
+
 
 ### Standalone (same as linux-pivot)
 
@@ -48,32 +56,50 @@ eggs produce --max
 | `EGGS_FEATURES` | *(empty)* | Space-separated penguins-eggs feature flags |
 | `EGGS_WORK_DIR` | `/tmp/penguins-eggs` | Working directory |
 
-## Supported distros and arches
+## Configuration
 
-Inherits full support from linux-pivot:
+<!-- Document configuration options here. This section is yours — the AI will not modify it. -->
 
-**Distros:** Debian, Ubuntu, Devuan, Arch, Fedora, Alpine, Void, openSUSE, Gentoo
+## CI
 
-**Arches:** `amd64` `arm64` `armhf` `riscv64` `ppc64el` `s390x` `loong64` `i386`
+<!-- AI:start:ci -->
+_CI documentation pending._
+<!-- AI:end:ci -->
 
-## Directory layout
+## Mirror chain
+
+<!-- AI:start:mirror-chain -->
+This repo is maintained in [`Interested-Deving-1896/penguins-pivot`](https://github.com/Interested-Deving-1896/penguins-pivot) and mirrored through:
 
 ```
-pivot.sh                       # main entry point (from linux-pivot)
-penguins-eggs/
-  integration.sh               # penguins-eggs integration layer
-lib/ extractors/ installers/   # inherited from linux-pivot
-kernel/                        # lkf kernel conversion layer
-config/                        # manifest schema + package map
-.github/workflows/ci.yml       # CI: shellcheck + extract + dry-run matrix
+Interested-Deving-1896/penguins-pivot  ──►  OpenOS-Project-OSP/penguins-pivot  ──►  OpenOS-Project-Ecosystem-OOC/penguins-pivot
 ```
 
-## Relationship to linux-pivot
+Changes flow downstream automatically via the hourly mirror chain in
+[`fork-sync-all`](https://github.com/Interested-Deving-1896/fork-sync-all).
+Direct commits to OSP or OOC are detected and opened as PRs back to `Interested-Deving-1896`.
+<!-- AI:end:mirror-chain -->
 
-This repo tracks linux-pivot. Distro/arch support, extractors, installers,
-and the kernel conversion layer are maintained upstream in linux-pivot and
-merged here. penguins-eggs-specific changes live only in `penguins-eggs/`.
+## Contributors
+
+<!-- AI:start:contributors -->
+_Contributors pending._
+<!-- AI:end:contributors -->
+
+## Origins
+
+<!-- AI:start:origins -->
+_Original project — no upstream fork._
+<!-- AI:end:origins -->
+
+## Resources
+
+<!-- AI:start:resources -->
+_No additional resource files found._
+<!-- AI:end:resources -->
 
 ## License
 
-MIT
+<!-- AI:start:license -->
+<!-- License not detected — add a LICENSE file to this repo. -->
+<!-- AI:end:license -->
